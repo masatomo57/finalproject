@@ -1,0 +1,69 @@
+{% extends "shiori/base.html" %}
+{% block title %}登録{% endblock %}
+{% block content %}
+<div>
+    <form action="/register" method="POST">
+        <label>日付：<input type="date" name="date"></label>
+
+        <table id="Table">
+            <tr>
+                <th>行動</th>
+                <th>開始時間</th>
+                <th>終了時間</th>
+            </tr>
+            <tr>
+                <td><input type="text" name="itinerary1"></td>
+                <td><input type="time" name="start1"></td>
+                <td><input type="time" name="end1"></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="itinerary2"></td>
+                <td><input type="time" name="start2"></td>
+                <td><input type="time" name="end2"></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="itinerary3"></td>
+                <td><input type="time" name="start3"></td>
+                <td><input type="time" name="end3"></td>
+            </tr>
+        </table>
+        <button type="button" id="add"> + </button>
+        <button type="submit">登録する</button>
+        <input type="hidden" id="counter" name="counter" value="4">
+    </form>
+    <p color="red">{{ validation }}</p>
+
+    <script>
+        let counter = 4;
+
+        document.querySelector("#add").addEventListener("click", () => {
+            let table = document.getElementById("Table");
+            let newRow = table.insertRow();
+
+            let newCell = newRow.insertCell();
+            let newinput = document.createElement("input");
+            newinput.setAttribute("type", "text");
+            newinput.setAttribute("name", `itinerary${counter}`);
+            newCell.appendChild(newinput);
+
+            newCell = newRow.insertCell();
+            let newstart = document.createElement("input");
+            newstart.setAttribute("type", "time");
+            newstart.setAttribute("name", `start${counter}`);
+            newCell.appendChild(newstart);
+
+            newCell = newRow.insertCell();
+            let newend = document.createElement("input");
+            newend.setAttribute("type", "time");
+            newend.setAttribute("name", `end${counter}`);
+            newCell.appendChild(newend);
+
+            counter++;
+            document.getElementById("counter").value=counter;
+        });
+    </script>
+</div>
+
+
+
+{% endblock %}

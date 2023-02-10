@@ -1,0 +1,129 @@
+{% extends "shiori/base.html" %}
+{% block title %}ホーム画面{% endblock %}
+{% block content %}
+
+<a href="/register"> 新規登録</a>
+
+<div>
+    <form action="/" method="POST">
+        {% for date in dates %}
+        <div>
+            {{ date.date }}
+            <table id="Table{{ loop.index }}">
+                <thead>
+                    <tr>
+                        <th colspan="2">時間</th>
+                        <th>行動</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody{{ loop.index }}">
+                {% for itinerary in Itinerarys_dict[date] %}
+                    <tr name="tr{{ itinerary.id }}" id="tr{{ itinerary.id }}">
+                        <td><input type="time" name="start{{ itinerary.id }}" id="start{{ itinerary.id }}" value={{ itinerary.start }}></td>
+                        <td><input type="time" name="end{{ itinerary.id }}" id="end{{ itinerary.id }}" value={{ itinerary.end }}></td>
+                        <td><input type="text" name="itinerary{{ itinerary.id }}" id="itinerary{{ itinerary.id }}" value={{ itinerary.itinerary }}></td>
+                        <td><button type="button" name="delete{{ itinerary.id }}" id="delete{{ itinerary.id }}"> - </button></td>
+                    </tr>
+                    <input type="hidden" id="date{{ itinerary.id }}" name="date{{ itinerary.id }}" value={{ itinerary.date }}>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button type="button" id="add{{ loop.index }}"> + </button>
+        </div>
+        {% endfor %}
+
+        <input type="hidden" id="counter" name="counter" value="{{ counter }}">
+
+        <input type="hidden" id="deletenum" name="deletenum" value="">
+
+        <div>
+            <button type="submit">更新</button>
+        </div>
+    </form>
+
+    <script>
+        let counter = {{ counter  }};
+
+        {% for date in dates %}
+        document.querySelector("#add{{ loop.index }}").addEventListener("click", () => {
+            let table = document.getElementById("tbody{{ loop.index }}");
+            let newRow = table.insertRow();
+            newRow.setAttribute("name", `tr${counter}`);
+            newRow.setAttribute("id", `tr${counter}`);
+
+            let newCell = newRow.insertCell();
+            let newstart = document.createElement("input");
+            newstart.setAttribute("type", "time");
+            newstart.setAttribute("name", `start${counter}`);
+            newCell.appendChild(newstart);
+
+            newCell = newRow.insertCell();
+            let newend = document.createElement("input");
+            newend.setAttribute("type", "time");
+            newend.setAttribute("name", `end${counter}`);
+            newCell.appendChild(newend);
+
+            newCell = newRow.insertCell();
+            let newinput = document.createElement("input");
+            newinput.setAttribute("type", "text");
+            newinput.setAttribute("name", `itinerary${counter}`);
+            newCell.appendChild(newinput);
+
+            newCell = newRow.insertCell();
+            let newdelete = document.createElement("button");
+            newdelete.setAttribute("type", "button");
+            newdelete.setAttribute("id", `delete${counter}`);
+            newdelete.textContent=" - ";
+            newCell.appendChild(newdelete);
+
+            let newdate = document.createElement("input");
+            newdate.setAttribute("type", "hidden");
+            newdate.setAttribute("name", `date${counter}`);
+            newdate.setAttribute("value", "{{ date.date }}");
+            table.appendChild(newdate);
+
+            counter++;
+            document.getElementById("counter").value=counter;
+            for (let i={{ counter }}; i<counter; i++){
+                try {
+                    document.querySelector(`#delete${i}`).addEventListener("click", () => {
+                        document.getElementById("deletenum").value = i;
+                        let tr = document.getElementById(`tr${i}`);
+                        tr.remove();
+                        let date = document.getElementById(`date${i}`);
+                        date.remove();
+                    })
+                } catch(error) {
+                    //何もしない
+                }
+            }
+        });
+        {% endfor %}
+
+        for (let i=1; i<{{ counter }}; i++){
+            try {
+                document.querySelector(`#delete${i}`).addEventListener("click", () => {
+                    document.getElementById("deletenum").value = i;
+                    let tr = document.getElementById(`tr${i}`);
+                    tr.remove();
+                    let date = document.getElementById(`date${i}`);
+                    date.remove();
+                })
+            } catch(error) {
+                //何もしない
+            }
+
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        {% for date in dates %}
+        var tbody{{ loop.index }} = document.getElementById('tbody{{ loop.index }}');
+        var sortable{{ loop.index }} = Sortable.create(tbody{{ loop.index }});
+        {% endfor %}
+    </script>
+
+</div>
+
+{% endblock %}
